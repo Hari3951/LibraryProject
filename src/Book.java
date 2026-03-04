@@ -55,8 +55,12 @@ public class Book {
 		return genre;
 	}
 
-    public boolean isChecked() {
+    public boolean isCheckedOut() {
         return isCheckOut;
+    }
+
+	public void setCheckedOut(boolean status) {
+         this.isCheckOut = staus;
     }
 
     // Method for displaying a single book 
