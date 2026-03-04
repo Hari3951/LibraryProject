@@ -9,6 +9,7 @@ public class Book {
     private static int totalBooks = 0;
 
     // Constructor for book class would go here
+	///uhhhh okay i didn't see all the stuff in minilibrary so some of these constructors need updating
     public Book(String title, String author) {
 		this.title = title;
 		this.author = author;
