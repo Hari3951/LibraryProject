@@ -18,6 +18,12 @@ public class MiniLibrary {
         }
     }
 
+    /*
+        Taking in a string as input, loops through the library.
+        If a substring of a book's title contains the input, adds it to an array which is returned
+
+        Then, sorts and prints out the list
+    */
     public ArrayList<Book> searchByTitle(String titleQuery) {
         ArrayList<Book> results = new ArrayList<Book>();
         String q = normalize(titleQuery);
@@ -94,12 +100,12 @@ public class MiniLibrary {
         System.out.print(b.toDetailedString());
 
         // Show siblings (other books in the series)
-        ArrayList<Book> siblings = b.findSiblings(this);
+        ArrayList<Book> siblings = b.findSiblings(this); //oh
         if (siblings.size() > 0) {
             System.out.println("Other books in the same series:");
             sortByRatingDesc(siblings);
             for (int i = 0; i < siblings.size(); i++) {
-                System.out.println("  " + siblings.get(i).toResultLine());
+                System.out.println("  " + siblings.get(i).toResultLine()); //what the heck is toResultLine()
             }
         } else {
             if (!normalize(b.getSeries()).equals("standalone")) {
@@ -129,6 +135,9 @@ public class MiniLibrary {
         return true;
     }
 
+    /*
+        Goes through the full scanning process to add a book to the inventory.
+    */
     public Book addBookInteractive(Scanner input) {
         if (input == null) return null;
 
@@ -237,6 +246,9 @@ public class MiniLibrary {
         return a.trim().equalsIgnoreCase(b.trim());
     }
 
+    /* 
+        Sorting algorithm which finds highest rating then sencond .. etc. until list is sorted
+    */
     private static void sortByRatingDesc(ArrayList<Book> list) {
         if (list == null) return;
 
@@ -267,8 +279,8 @@ public class MiniLibrary {
                     return r;
                 }
             } catch (Exception e) {
+                System.out.println("Please enter a valid number from 0 to 10.");
             }
-            System.out.println("Please enter a valid number from 0 to 10.");
         }
     }
 
