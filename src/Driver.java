@@ -2,8 +2,11 @@ public class Driver {
     // team we need to figure this one out
 
     // any ideas??
+    //  we have the MiniLibrary class hold all the detailed functions for prompting and then just run the prmoping from the driver
 
 
+
+    //ignore this:
     //uhhhhh ok so:
     //everything loads in, and we can throw the users into a library with a message like:
     //"[Library Name]"
