@@ -1,3 +1,5 @@
+//okay I'm gonna try to work on this and get the driver class implemented tonight. text me if ur working too so we don't code the same thing
+// - yingqi (510-815-6853)
 public class Book {
     
     private String title;
