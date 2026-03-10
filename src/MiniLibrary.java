@@ -15,17 +15,13 @@ public class MiniLibrary {
         if (startingInventory != null) {
             for (int i = 0; i < startingInventory.size(); i++) {
                 Book b = startingInventory.get(i);
-                if (b != null) inventory.add(b);
+                if (b != null) {
+                    inventory.add(b);
+                }
             }
         }
     }
 
-    /*
-        Taking in a string as input, loops through the library.
-        If a substring of a book's title contains the input, adds it to an array which is returned
-
-        Then, sorts and prints out the list
-    */
     public ArrayList<Book> searchByTitle(String titleQuery) {
         ArrayList<Book> results = new ArrayList<Book>();
         String q = normalize(titleQuery);
@@ -41,9 +37,9 @@ public class MiniLibrary {
         }
 
         sortByRatingDesc(results);
-        //printResults(results); //commented bc i want to search both title and author
         return results;
     }
+
     public ArrayList<Book> searchByAuthor(String authorQuery) {
         ArrayList<Book> results = new ArrayList<Book>();
         String q = normalize(authorQuery);
@@ -59,37 +55,50 @@ public class MiniLibrary {
         }
 
         sortByRatingDesc(results);
-        //printResults(results);
         return results;
     }
 
-  public ArrayList<Book> recommend(String optionalGenre) {
+    public ArrayList<Book> recommend(String optionalGenre) {
         ArrayList<Book> results = new ArrayList<Book>();
-
         String g = normalize(optionalGenre);
         boolean filterGenre = (g.length() > 0);
 
         for (int i = 0; i < inventory.size(); i++) {
             Book b = inventory.get(i);
             if (b != null) {
-                if (!filterGenre) { //if input genre is blank
-                    results.add(b); //add b to returned results
-                } else {//if input genre is not blank
-                    if (normalize(b.getGenre()).equals(g)) { 
-                        results.add(b);
-                    }
+                if (!filterGenre) {
+                    results.add(b);
+                } else if (normalize(b.getGenre()).equals(g)) {
+                    results.add(b);
                 }
             }
         }
 
         sortByRatingDesc(results);
-        //printResults(results);
         return results;
     }
 
-//    public ArrayList<Book> recommend() {
-//        return recommend("");
-//    }
+    public ArrayList<Book> getCheckedOutBooks() {
+        ArrayList<Book> results = new ArrayList<Book>();
+        for (int i = 0; i < inventory.size(); i++) {
+            Book b = inventory.get(i);
+            if (b != null && b.isCheckedOut()) {
+                results.add(b);
+            }
+        }
+        return results;
+    }
+
+    public ArrayList<Book> getAvailableBooks() {
+        ArrayList<Book> results = new ArrayList<Book>();
+        for (int i = 0; i < inventory.size(); i++) {
+            Book b = inventory.get(i);
+            if (b != null && !b.isCheckedOut()) {
+                results.add(b);
+            }
+        }
+        return results;
+    }
 
     public Book inspectByTitle(String exactTitle) {
         Book b = getByExactTitle(exactTitle);
@@ -98,38 +107,35 @@ public class MiniLibrary {
             return null;
         }
 
-		System.out.println("\n[-------- Book Inspection --------]");
-		System.out.println("\""+b.getTitle()+"\""+" ("+b.getSeries()+")");
-		System.out.println("by "+b.getAuthor());
-		System.out.println();
-		System.out.println("Rating: "+b.getRating());
-		System.out.println("Genre: "+b.getGenre());
-		
-		 // Show siblings (other books in the series)
-        ArrayList<Book> siblings = b.findSiblings(this); //oh
+        System.out.println("\n[-------- Book Inspection --------]");
+        System.out.println("\"" + b.getTitle() + "\"" + " (" + b.getSeries() + ")");
+        System.out.println("by " + b.getAuthor());
+        System.out.println();
+        System.out.println("Genre: " + b.getGenre());
+        System.out.println("Rating: " + b.getRating());
+
+        if (b.isCheckedOut()) {
+            System.out.println("Status: Checked Out");
+        } else {
+            System.out.println("Status: Available");
+        }
+
+        ArrayList<Book> siblings = b.findSiblings(this);
         if (siblings.size() > 0) {
             System.out.println("Other books in the same series:");
             sortByRatingDesc(siblings);
             for (int i = 0; i < siblings.size(); i++) {
-                System.out.println("  " + siblings.get(i)); 
+                System.out.println("  " + siblings.get(i));
             }
         } else {
             if (!normalize(b.getSeries()).equals("standalone")) {
-                System.out.println(" No other books in the library from this series.");
+                System.out.println("No other books in the library from this series.");
             } else {
-                System.out.println(" This book is a Standalone (no series).");
+                System.out.println("This book is a Standalone (no series).");
             }
         }
-        
-		System.out.println("\n(you can imagine a summary of the book here)");
-		System.out.println("[---------------------------------]\n");
-        
-//        System.out.println("What you can do next in code:");
-//        System.out.println("  book.rate(9.5);");
-//        System.out.println("  library.checkout(\"" + b.getTitle() + "\");");
-//        System.out.println("  library.returnBook(\"" + b.getTitle() + "\");");
-//        System.out.println("- - - - - - - - - - - - - - -");
 
+        System.out.println("[---------------------------------]\n");
         return b;
     }
 
@@ -143,9 +149,6 @@ public class MiniLibrary {
         return true;
     }
 
-    /*
-        Goes through the full scanning process to add a book to the inventory.
-    */
     public Book addBookInteractive(Scanner input) {
         if (input == null) return null;
 
@@ -158,6 +161,7 @@ public class MiniLibrary {
             System.out.println("Title cannot be blank.");
             return null;
         }
+
         if (getByExactTitle(title) != null) {
             System.out.println("A book with that title already exists.");
             return null;
@@ -166,12 +170,14 @@ public class MiniLibrary {
         System.out.print("Author: ");
         String author = input.nextLine().trim();
 
-        System.out.print("Genre (Fantasy, Mystery, Romance, Historical Fiction, Horror, Nonfiction, etc.): ");
+        System.out.print("Genre: ");
         String genre = input.nextLine().trim();
 
         System.out.print("Series name (or press Enter for Standalone): ");
         String series = input.nextLine().trim();
-        if (series.length() == 0) series = "Standalone";
+        if (series.length() == 0) {
+            series = "Standalone";
+        }
 
         double rating = readRating(input);
 
@@ -195,21 +201,27 @@ public class MiniLibrary {
         return false;
     }
 
-//    public boolean checkout(String exactTitle) {
-//        Book b = getByExactTitle(exactTitle);
-//        if (b == null) return false;
-//        if (b.isCheckedOut()) return false;
-//        b.setCheckedOut(true);
-//        return true;
-//    }
-//
-//    public boolean returnBook(String exactTitle) {
-//        Book b = getByExactTitle(exactTitle);
-//        if (b == null) return false;
-//        if (!b.isCheckedOut()) return false;
-//        b.setCheckedOut(false);
-//        return true;
-//    }
+    public boolean checkout(String exactTitle) {
+        Book b = getByExactTitle(exactTitle);
+        if (b == null) return false;
+        if (b.isCheckedOut()) return false;
+        b.setCheckedOut(true);
+        return true;
+    }
+
+    public boolean returnBook(String exactTitle) {
+        Book b = getByExactTitle(exactTitle);
+        if (b == null) return false;
+        if (!b.isCheckedOut()) return false;
+        b.setCheckedOut(false);
+        return true;
+    }
+
+    public boolean rateBook(String exactTitle, double rating) {
+        Book b = getByExactTitle(exactTitle);
+        if (b == null) return false;
+        return b.rate(rating);
+    }
 
     public ArrayList<Book> getInventory() {
         ArrayList<Book> copy = new ArrayList<Book>();
@@ -219,18 +231,24 @@ public class MiniLibrary {
         return copy;
     }
 
-    public int size() { return inventory.size(); }
+    public int size() {
+        return inventory.size();
+    }
 
     public void printResults(ArrayList<Book> results) {
         System.out.println("\n----==// Library Results //==----\n");
         if (results == null || results.size() == 0) {
-            System.out.println("\n           (no matches)\n");
+            System.out.println("(no matches)\n");
         } else {
             for (int i = 0; i < results.size(); i++) {
-                System.out.println("["+i+"] "+results.get(i));
+                System.out.println("[" + i + "] " + results.get(i));
             }
         }
-        System.out.println("\n------========<<📙>>========------\n");
+        System.out.println("------========<<📙>>========------\n");
+    }
+
+    public void printAllBooks() {
+        printResults(inventory);
     }
 
     private Book getByExactTitle(String exactTitle) {
@@ -254,9 +272,6 @@ public class MiniLibrary {
         return a.trim().equalsIgnoreCase(b.trim());
     }
 
-    /* 
-        Sorting algorithm which finds highest rating then sencond .. etc. until list is sorted
-    */
     private static void sortByRatingDesc(ArrayList<Book> list) {
         if (list == null) return;
 
@@ -276,7 +291,6 @@ public class MiniLibrary {
     }
 
     private static double readRating(Scanner input) {
-       
         while (true) {
             System.out.print("Rating (0.0 to 10.0): ");
             String line = input.nextLine().trim();
@@ -287,37 +301,9 @@ public class MiniLibrary {
                     return r;
                 }
             } catch (Exception e) {
-                System.out.println("Please enter a valid number from 0 to 10.");
             }
+
+            System.out.println("Please enter a valid number from 0 to 10.");
         }
     }
-
-//    public static void main(String[] args) {
-//        MiniLibrary library = new MiniLibrary();
-//
-//        library.add(new Book("The Hobbit", "J.R.R. Tolkien", "Fantasy", 9.2, "Middle-earth"));
-//        library.add(new Book("The Fellowship of the Ring", "J.R.R. Tolkien", "Fantasy", 9.5, "The Lord of the Rings"));
-//        library.add(new Book("The Two Towers", "J.R.R. Tolkien", "Fantasy", 9.3, "The Lord of the Rings"));
-//        library.add(new Book("The Return of the King", "J.R.R. Tolkien", "Fantasy", 9.6, "The Lord of the Rings"));
-//        library.add(new Book("Murder on the Orient Express", "Agatha Christie", "Mystery", 8.7, "Hercule Poirot"));
-//
-//        Scanner sc = new Scanner(System.in);
-//
-//        library.recommend("Fantasy");
-//        library.searchByAuthor("Tolkien");
-//
-//        Book inspected = library.inspectByTitle("The Hobbit");
-//        if (inspected != null) {
-//            inspected.rate(9.8);
-//        }
-//
-//
-//        boolean ok = library.checkout("The Hobbit");
-//        System.out.println("Checkout The Hobbit success? " + ok);
-//
-//        boolean ok2 = library.returnBook("The Hobbit");
-//        System.out.println("Return The Hobbit success? " + ok2);
-//
-//        sc.close();
-//    }
 }
